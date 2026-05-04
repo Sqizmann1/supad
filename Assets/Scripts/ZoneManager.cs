@@ -10,6 +10,10 @@ public class ZoneManager : MonoBehaviour
     public Vector3 targetPosition;
     public float moveSpeed = 2f;
 
+    public float damage = 20f;
+    public bool inZone;
+    private PlayerController playerController;
+
     private void Start()
     {
         float x = Random.Range(20, 200);
@@ -24,5 +28,25 @@ public class ZoneManager : MonoBehaviour
             zone.localScale -= new Vector3(1, 0, 1) * shrinkSpeed * Time.deltaTime;
         }
         zone.position = Vector3.MoveTowards(zone.position, targetPosition, moveSpeed * Time.deltaTime);
+
+        if (inZone == false)
+        {
+            Damage();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        inZone = true;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        inZone = false;
+    }
+
+    void Damage()
+    {
+      playerController.HP -= damage;
     }
 }

@@ -15,6 +15,10 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody rb;
     private Vector3 movement;
+
+    public GroundChecker groundChecker;
+
+    public float HP;
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -45,7 +49,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && groundChecker.isGrounded == true)
         {
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
