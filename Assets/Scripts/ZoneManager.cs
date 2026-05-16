@@ -19,6 +19,7 @@ public class ZoneManager : MonoBehaviour
         float x = Random.Range(20, 200);
         float z = Random.Range(20, 200);
         targetPosition = new Vector3(x, 15, z);
+        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     void Update()
