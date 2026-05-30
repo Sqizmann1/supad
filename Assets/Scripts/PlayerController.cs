@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour
 
     private void Shoot()
     {
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(0) && groundChecker.isGrounded == true)
         {
             playerAnimator.Play("Fire");
         }
@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour
 
     private void Reload()
     {
-        if (Input.GetKeyDown("r"))
+        if (Input.GetKeyDown("r") && groundChecker.isGrounded == true)
         {
             playerAnimator.Play("Reload");
         }
