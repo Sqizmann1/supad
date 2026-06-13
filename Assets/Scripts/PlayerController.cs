@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -20,14 +21,28 @@ public class PlayerController : MonoBehaviour
 
     private Animator playerAnimator;
 
+    [Header("Inventory")]
+    private InventoryManager inventoryManager;
+    public List<ItemData> inventoryItems;
+    private Transform itemParent;
+
     public float HP;
+
+    private void Awake()
+    {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        inventoryManager = GameObject.Find("InventoryManager").GetComponent<InventoryManager>();
+        itemParent = GameObject.Find("InventoryContent").transform;
+        inventoryManager.CreateItem(0, inventoryItems);
+    }
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-
         rb = GetComponent<Rigidbody>();
 
         playerAnimator = GetComponent<Animator>();
+
+       // EquipItem("RIFLE");
     }
     void Update()
     {
@@ -38,6 +53,14 @@ public class PlayerController : MonoBehaviour
         Reload();
 
         playerAnimator.SetBool("isGrounded", groundChecker.isGrounded);
+        if(Input.GetKeyDown(KeyCode.Tab) && !inventoryManager.inventoryPanel.activeSelf)
+        {
+            OpenInventory();
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            CloseInventoryPanels();
+        }
     }
 
     void FixedUpdate()
@@ -99,4 +122,57 @@ public class PlayerController : MonoBehaviour
             playerAnimator.Play("Reload");
         }
     }
+    private void OpenInventory()
+    {
+        //canMove = false;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Confined;
+
+        inventoryManager.inventoryPanel.SetActive(true);
+        if(inventoryItems.Count > 0)
+        {
+            for(int i = 0; i<inventoryItems.Count; i++)
+            {
+                inventoryManager.InstantiatingItem(inventoryItems[i], itemParent, inventoryManager.inventorySlots);
+            }
+        }
+    }
+
+    private void CloseInventoryPanels()
+    {
+   // canMove = true;
+    Cursor.visible = false;
+    Cursor.lockState = CursorLockMode.Locked;
+
+   // foreach (GameObject slot in inventoryManager.currentChestSlots)
+    //{
+    //   Destroy(slot);
+    //}
+    foreach (GameObject slot in inventoryManager.inventorySlots)
+    {
+        Destroy(slot);
+    }
+
+    //inventoryManager.currentChestSlots.Clear();
+    inventoryManager.inventorySlots.Clear();
+
+    inventoryManager.inventoryPanel.SetActive(false);
+    //inventoryManager.chestPanel.SetActive(false);
+    }
+    //private void EquipItem(string toolName)
+    //{
+    //    foreach (GameObject tool in equipableItems)
+    //    {
+    //        if (tool.name == toolName)
+    //        {
+    //            tool.SetActive(true);
+    //            currentEquipedItem = tool;
+    //            toolName = EQUIPE_NOT_SELECTED_TEXT;
+    //        }
+    //        else
+    //        {
+    //            tool.SetActive(false);
+    //        }
+    //    }
+    //}
 }
