@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class PlayerController : MonoBehaviour
 {
@@ -28,6 +29,16 @@ public class PlayerController : MonoBehaviour
 
     public float HP;
 
+
+    [Header("Equipment")]
+    public const string EQUIPE_NOT_SELECTED_TEXT = "EquipeNotSelected";
+    [HideInInspector]
+    public string itemYouCanEquipeName = EQUIPE_NOT_SELECTED_TEXT;
+    [SerializeField] GameObject[] equipableItems;
+    [SerializeField] private GameObject currentEquipedItem;
+
+    //public string itemName = "BULLETS";
+
     private void Awake()
     {
         Cursor.visible = false;
@@ -35,6 +46,7 @@ public class PlayerController : MonoBehaviour
         inventoryManager = GameObject.Find("InventoryManager").GetComponent<InventoryManager>();
         itemParent = GameObject.Find("InventoryContent").transform;
         inventoryManager.CreateItem(0, inventoryItems);
+        inventoryManager.CreateItem(1, inventoryItems);
     }
     void Start()
     {
@@ -42,7 +54,8 @@ public class PlayerController : MonoBehaviour
 
         playerAnimator = GetComponent<Animator>();
 
-       // EquipItem("RIFLE");
+        // EquipItem("RIFLE");
+        GetItemCount("BULLETS");
     }
     void Update()
     {
@@ -112,11 +125,13 @@ public class PlayerController : MonoBehaviour
         if(Input.GetMouseButtonDown(0) && groundChecker.isGrounded == true)
         {
             playerAnimator.Play("Fire");
+
         }
     }
 
     private void Reload()
     {
+        // нужна ссылка из rifleshooter
         if (Input.GetKeyDown("r") && groundChecker.isGrounded == true)
         {
             playerAnimator.Play("Reload");
@@ -159,20 +174,63 @@ public class PlayerController : MonoBehaviour
     inventoryManager.inventoryPanel.SetActive(false);
     //inventoryManager.chestPanel.SetActive(false);
     }
-    //private void EquipItem(string toolName)
+    private void EquipItem(string toolName)
+    {
+        foreach (GameObject tool in equipableItems)
+        {
+            if (tool.name == toolName)
+            {
+                tool.SetActive(true);
+                currentEquipedItem = tool;
+                toolName = EQUIPE_NOT_SELECTED_TEXT;
+            }
+            else
+            {
+                tool.SetActive(false);
+            }
+        }
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("BulletPack"))
+        {
+            inventoryManager.CreateItem(1, inventoryItems);
+            Destroy(other.gameObject);
+        }
+    }
+
+    public void ModifyItemCount(string itemName)
+    {
+        foreach (ItemData item in inventoryItems)    // пошук в масиві конкретного блока
+        {
+            if (item.name == itemName)               // перевірка по імені
+            {
+                item.count--;
+                if (item.count <= 0)                  // перевірка на закінчення в інвентарі
+                {
+                    inventoryItems.Remove(item);    // видалення предмету зі списку
+                    EquipItem(inventoryItems[0].name);      // екіпірування кірки
+                }
+                break;
+            }
+        }
+    }
+
+    //public int GetCurrentAmmo()
     //{
-    //    foreach (GameObject tool in equipableItems)
-    //    {
-    //        if (tool.name == toolName)
-    //        {
-    //            tool.SetActive(true);
-    //            currentEquipedItem = tool;
-    //            toolName = EQUIPE_NOT_SELECTED_TEXT;
-    //        }
-    //        else
-    //        {
-    //            tool.SetActive(false);
-    //        }
-    //    }
+
     //}
+
+    public int GetItemCount(string itemName)
+    {
+        foreach (ItemData item in inventoryItems)
+        {
+            if (item.name == itemName)
+            {
+                //Debug.Log(item.count);
+                return item.count;
+            }
+        }
+        return 0;
+    }
 }

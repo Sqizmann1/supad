@@ -58,7 +58,7 @@ public class InventoryManager : MonoBehaviour
             {
                 if (item.id == itemsList[i].id)                          // якщо збіг знайдено та ID співпадають
                 {
-                    itemsList[i].count += 1;                            // додаємо в список +1 предмет
+                    itemsList[i].count += item.count;                            // додаємо в список +1 предмет
                     break;
                 }
                 else if (i == itemsList.Count - 1)                       // якщо збігів не знеайдено
@@ -91,4 +91,6 @@ public class InventoryManager : MonoBehaviour
 
         itemsList.Add(go);
     }
+
+
 }

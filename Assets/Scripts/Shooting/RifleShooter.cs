@@ -1,7 +1,10 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class RifleShooter : MonoBehaviour
 {
+    private PlayerController controllerScript;
     [Header("References")]
     public Transform muzzle;           // точка выхода пули (дуло)
     public Camera playerCamera;        // камера игрока
@@ -22,23 +25,31 @@ public class RifleShooter : MonoBehaviour
     private float nextFireTime;
     private bool isReloading;
 
+    private int totalAmmo;
+
     void Start()
     {
+        controllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
+        totalAmmo = controllerScript.GetItemCount("BULLETS");
+        Debug.Log(totalAmmo);
         currentAmmo = magazineSize;
     }
 
     void Update()
     {
         if (isReloading) return;
-
-        if (currentAmmo <= 0 || Input.GetKeyDown(KeyCode.R))
+        if (totalAmmo > 0 )
         {
-            StartCoroutine(Reload());
-            return;
+            if (currentAmmo <= 0 || Input.GetKeyDown(KeyCode.R))
+            {
+                StartCoroutine(Reload());
+                return;
+            }
         }
+        
 
         // јвтоматическа€ стрельба Ч зажата€ кнопка
-        if (Input.GetButton("Fire1") && Time.time >= nextFireTime)
+        if (Input.GetButton("Fire1") && Time.time >= nextFireTime && totalAmmo > 0)
             Shoot();
     }
 
@@ -48,6 +59,8 @@ public class RifleShooter : MonoBehaviour
 
         nextFireTime = Time.time + fireRate;
         currentAmmo--;
+        totalAmmo--;
+        controllerScript.ModifyItemCount("BULLETS");
 
         for (int i = 0; i < bulletsPerShot; i++)
         {
