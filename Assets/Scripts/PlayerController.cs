@@ -37,6 +37,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject[] equipableItems;
     [SerializeField] private GameObject currentEquipedItem;
 
+    private RifleShooter rifleShooterScript;
+
     //public string itemName = "BULLETS";
 
     private void Awake()
@@ -47,6 +49,8 @@ public class PlayerController : MonoBehaviour
         itemParent = GameObject.Find("InventoryContent").transform;
         inventoryManager.CreateItem(0, inventoryItems);
         inventoryManager.CreateItem(1, inventoryItems);
+
+        rifleShooterScript = GameObject.Find("Gun").GetComponent<RifleShooter>();
     }
     void Start()
     {
@@ -62,7 +66,7 @@ public class PlayerController : MonoBehaviour
         Movement();
         Rotation();
         Jump();
-        Shoot();
+        //Shoot();
         Reload();
 
         playerAnimator.SetBool("isGrounded", groundChecker.isGrounded);
@@ -120,19 +124,19 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);
     }
 
-    private void Shoot()
+    public void Shoot()
     {
-        if(Input.GetMouseButtonDown(0) && groundChecker.isGrounded == true)
-        {
+        //if(Input.GetMouseButtonDown(0) && groundChecker.isGrounded == true)
+        //{
             playerAnimator.Play("Fire");
 
-        }
+        //}
     }
 
     private void Reload()
     {
         // нужна ссылка из rifleshooter
-        if (Input.GetKeyDown("r") && groundChecker.isGrounded == true)
+        if (rifleShooterScript.isReloading)
         {
             playerAnimator.Play("Reload");
         }
@@ -195,6 +199,7 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("BulletPack"))
         {
             inventoryManager.CreateItem(1, inventoryItems);
+            rifleShooterScript.AddAmmo();
             Destroy(other.gameObject);
         }
     }

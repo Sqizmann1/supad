@@ -21,11 +21,15 @@ public class RifleShooter : MonoBehaviour
     public int magazineSize = 30;
     public float reloadTime = 2f;
 
-    private int currentAmmo;
+    public int currentAmmo;
     private float nextFireTime;
-    private bool isReloading;
+    public bool isReloading;
 
     private int totalAmmo;
+
+    [Header("Sound")]
+    public AudioSource audioSource;
+    public AudioClip shootSound;
 
     void Start()
     {
@@ -33,6 +37,7 @@ public class RifleShooter : MonoBehaviour
         totalAmmo = controllerScript.GetItemCount("BULLETS");
         Debug.Log(totalAmmo);
         currentAmmo = magazineSize;
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -72,6 +77,12 @@ public class RifleShooter : MonoBehaviour
         }
 
         // TODO: Muzzle flash, звук, анимация
+
+        controllerScript.Shoot();
+        if (audioSource != null && shootSound != null)
+        {
+            audioSource.PlayOneShot(shootSound);
+        }
     }
 
     Vector3 GetShootDirection()
@@ -112,4 +123,9 @@ public class RifleShooter : MonoBehaviour
 
     // Для UI
     public string GetAmmoText() => $"{currentAmmo} / {magazineSize}";
+
+    public void AddAmmo()
+    {
+        totalAmmo += 30; 
+    }
 }

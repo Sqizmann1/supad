@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class ZombieAI : MonoBehaviour, IDamageable
 {
@@ -11,6 +12,7 @@ public class ZombieAI : MonoBehaviour, IDamageable
     [Header("Health")]
     public float maxHealth = 100f;
     private float currentHealth;
+    public Slider healthSlider;
 
     [Header("Distances")]
     public float walkDistance = 15f;
@@ -33,6 +35,9 @@ public class ZombieAI : MonoBehaviour, IDamageable
 
         if (animator == null)
             animator = GetComponent<Animator>();
+
+        healthSlider.maxValue = maxHealth;
+        healthSlider.value = currentHealth;
     }
 
     void Update()
@@ -100,6 +105,8 @@ public class ZombieAI : MonoBehaviour, IDamageable
             return;
 
         currentHealth -= amount;
+
+        healthSlider.value = currentHealth;
 
         if (currentHealth <= 0)
         {
